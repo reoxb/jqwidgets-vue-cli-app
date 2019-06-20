@@ -1,28 +1,59 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <JqxGrid :width="width" :source="dataAdapter" :columns="columns"
+             :pageable="true" :autoheight="true" :sortable="true"
+             :altrows="true" :enabletooltip="true" :editable="true"
+             :selectionmode="'multiplecellsadvanced'" :columngroups="columngroups">
+    </JqxGrid>
 </template>
-
 <script>
-import HelloWorld from './components/HelloWorld.vue'
-
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
+    import JqxGrid from "jqwidgets-scripts/jqwidgets-vue/vue_jqxgrid.vue";
+    export default {
+        components: {
+            JqxGrid
+        },
+        data: function () {
+            return {
+                width: 850,
+                dataAdapter: new window.jqx.dataAdapter(this.source),
+                columns: [
+                    { text: 'Product Name', columngroup: 'ProductDetails', datafield: 'ProductName', width: 250 },
+                    { text: 'Quantity per Unit', columngroup: 'ProductDetails', datafield: 'QuantityPerUnit', cellsalign: 'right', align: 'right' },
+                    { text: 'Unit Price', columngroup: 'ProductDetails', datafield: 'UnitPrice', align: 'right', cellsalign: 'right', cellsformat: 'c2' },
+                    { text: 'Units In Stock', datafield: 'UnitsInStock', cellsalign: 'right', cellsrenderer: this.cellsrenderer, width: 100 },
+                    { text: 'Discontinued', columntype: 'checkbox', datafield: 'Discontinued', align: 'center' }
+                ],
+                columngroups: [
+                    { text: 'Product Details', align: 'center', name: 'ProductDetails' }
+                ]
+            }
+        },
+        beforeCreate: function () {
+            this.source = {
+                datatype: 'xml',
+                datafields: [
+                    { name: 'ProductName', type: 'string' },
+                    { name: 'QuantityPerUnit', type: 'int' },
+                    { name: 'UnitPrice', type: 'float' },
+                    { name: 'UnitsInStock', type: 'float' },
+                    { name: 'Discontinued', type: 'bool' }
+                ],
+                root: 'Products',
+                record: 'Product',
+                id: 'ProductID',
+                url: 'sampledata/products.xml'
+            };
+        },
+        methods: {
+            cellsrenderer: function (row, columnsfield, value, defaulthtml, columnproperties, rowdata) {
+                if (value < 20) {
+                    return '<span style="margin: 4px; float: ' + columnproperties.cellsalign + '; color: #ff0000;">' + value + '</span>';
+                }
+                else {
+                    return '<span style="margin: 4px; float: ' + columnproperties.cellsalign + '; color: #008000;">' + value + '</span>';
+                }
+            }
+        }
+    }
 </script>
-
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
